@@ -15,7 +15,7 @@ const uint16_t Lem1802::def_palette_map[16] = {     /// Default palette
 };
 
 Lem1802::Lem1802() : screen_map (0), font_map (0), palette_map (0),
-                     border_col (0), ticks(0), blink(0) {
+                     border_col (0), blink(0) {
     _width = Lem1802::WIDTH;
     _height = Lem1802::HEIGHT;
     pixels = new uint8_t[4 * _width * _height]();
@@ -30,7 +30,7 @@ void Lem1802::attachTo (DCPU* cpu, size_t index)
 {
     this->IHardware::attachTo(cpu, index);
 
-    blink_max = cpu->getClock() / Lem1802::BLINKPERSECOND;
+    blink_max = cpu->getClock() / (50*Lem1802::BLINKPERSECOND);
     blink = 0;
 
     screen_map = font_map, palette_map = 0;
@@ -47,7 +47,7 @@ unsigned Lem1802::handleInterrupt()
         case MEM_MAP_SCREEN:
             if (screen_map == 0 && cpu->getB() != 0) {
                 splash = true;
-                splashtime = cpu->getClock() * SPLASHTIME;
+                splashtime = (cpu->getClock() * SPLASHTIME) / REFRESHRATE;
             }
 
             screen_map = cpu->getB();
@@ -88,19 +88,18 @@ unsigned Lem1802::handleInterrupt()
 
 void Lem1802::tick()
 {
+	tick_wait = cpu->getClock() / REFRESHRATE;
+
     if (this->cpu == NULL) return;
 
-    if (++ticks > cpu->getClock() /REFRESHRATE) {
-        // Update screen at 50Hz aprox
-        ticks -= cpu->getClock() / REFRESHRATE;
-        this->updateScreen();
-    }
+	this->updateScreen();
 
     if (splash && splashtime-- == 0)
         splash = false;
 
     if (++blink > (blink_max << 1))
         blink -= blink_max << 1;
+	
 }
 
 void Lem1802::updateScreen()

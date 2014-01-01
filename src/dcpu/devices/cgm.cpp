@@ -70,7 +70,7 @@ unsigned CGM::handleInterrupt()
         if (bitfield_map != 0 && attribute_map == 0 && cpu->getB() != 0) {
             videomode = 0;
             splash = true;
-            splashtime = cpu->getClock() * SPLASHTIME;
+            splashtime = (cpu->getClock() * SPLASHTIME) / REFRESHRATE;
         }
 
         attribute_map = cpu->getB();
@@ -129,12 +129,11 @@ unsigned CGM::handleInterrupt()
 
 void CGM::tick()
 {
+	tick_wait = cpu->getClock() / REFRESHRATE;
+
     if (this->cpu == NULL) return;
-    if (++ticks > cpu->getClock() /REFRESHRATE) {
-        // Update screen at Refresh rate aprox.
-        ticks -= cpu->getClock() /REFRESHRATE;
-        this->updateScreen();
-    }
+
+	this->updateScreen();
 
     if (splash && splashtime-- == 0)
         splash = false;

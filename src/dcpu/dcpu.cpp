@@ -770,7 +770,10 @@ void DCPU::tickHardware()
 
     for (auto hw = needtick_hardware.begin(); hw != needtick_hardware.end();
             hw ++) {
-        (*hw)->tick();
+		if ((*hw)->tick_wait)
+			(*hw)->tick_wait--;
+		else
+			(*hw)->tick();
     }
 }
 
