@@ -47,7 +47,7 @@ unsigned Lem1802::handleInterrupt()
         case MEM_MAP_SCREEN:
             if (screen_map == 0 && cpu->getB() != 0) {
                 splash = true;
-                splashtime = (cpu->getClock() * SPLASHTIME) / REFRESHRATE;
+                splashtime =  SPLASHTIME * REFRESHRATE;
             }
 
             screen_map = cpu->getB();

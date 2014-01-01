@@ -58,7 +58,7 @@ unsigned CGM::handleInterrupt()
         if (bitfield_map == 0 && attribute_map != 0 && cpu->getB() != 0) {
             videomode = 0;
             splash = true;
-            splashtime = cpu->getClock() * SPLASHTIME;
+            splashtime = REFRESHRATE * SPLASHTIME;
         }
 
         bitfield_map = cpu->getB();
